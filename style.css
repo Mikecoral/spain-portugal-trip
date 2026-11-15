@@ -12,3 +12,5 @@
 .staybar #bcnHotelMaps{color:#634c75;font-size:12px;white-space:nowrap}.staybar #bcnHotelMaps[hidden]{display:none}.day4 .maplegend{display:flex}.day4 .maplegend span:last-child{display:inline}.bcn-hotel-icon>span{outline:2px solid #775a8b}@media(max-width:760px){.day4 .staybar{flex-wrap:wrap}.day4 .staybar div{flex:1;min-width:220px}.day4 .staybar #bcnHotelMaps{margin-left:37px;font-size:11px}.day4 .staybar button{max-width:none}.day4 .maplegend{font-size:9px;gap:9px;padding:6px 8px}}
 
 .optional-marker .pin{background:#fff!important;color:#977445;border:2px dashed #977445;box-shadow:none}
+
+.tab:nth-child(6) i{background:#977445}.tab:nth-child(6)[aria-selected=true]{background:#f3eadc;border-color:#c8b697;color:#795d38}.tabs{min-width:0}.navhint{flex-shrink:0;margin-left:12px}@media(max-width:1200px){.navhint{display:none}}
