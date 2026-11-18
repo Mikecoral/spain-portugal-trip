@@ -10,7 +10,8 @@
   };
 
   const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-  const NUM_CN = ['一', '二', '三', '四', '五', '六', '七', '八'];
+  const NUM_CN = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const OFFLINE_KEY = 'trip-offline-v2';
   const WEEKDAY = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
   const isTouch = matchMedia('(pointer: coarse)').matches;
   const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -72,8 +73,8 @@
     return pts;
   }
 
-  function fit() {
-    if (map) map.fitBounds(boundsPoints(), { paddingTopLeft: [45, 80], paddingBottomRight: [55, 110], maxZoom: 15 });
+  function fit(points = boundsPoints()) {
+    if (map) map.fitBounds(points, { paddingTopLeft: [45, 80], paddingBottomRight: [55, 110], maxZoom: 15 });
   }
 
   function drawMap() {
@@ -89,7 +90,8 @@
     }
 
     const off = new Set(t.offRoute || []);
-    L.polyline(t.coords.filter((p, i) => p && !off.has(i)), {
+    const route = t.routeStops?.map(i => t.coords[i]) ?? t.coords.filter((p, i) => p && !off.has(i));
+    L.polyline(route, {
       color: THEMES[t.theme].accent, weight: 3, dashArray: '3 10', opacity: .55, lineCap: 'round'
     }).addTo(routeLayer);
 
@@ -107,7 +109,7 @@
         .bindPopup(`<strong>${esc(s[1])}</strong><br><a href="${esc(mapsUrlFor(day, s))}" target="_blank" rel="noopener noreferrer">在 Google Maps 打开 ↗</a>`)
         .on('click', () => { $('#search').value = ''; renderList(); focusStop(i); });
     });
-    fit();
+    fit(t.routeStops ? route : undefined);
   }
 
   function focusStop(i) {
@@ -172,7 +174,7 @@
         (s[7] ? `<a href="${esc(s[7])}" target="_blank" rel="noopener noreferrer">官方信息 / 购票 ↗</a>` : '') +
         '</div></details>';
     }).join('');
-    $('#list').innerHTML = html || '<p class="empty">没有匹配的地点，试试中文或西班牙语名称。</p>';
+    $('#list').innerHTML = html || '<p class="empty">没有匹配的地点，试试中文或当地名称。</p>';
   }
 
   function render() {
@@ -220,9 +222,15 @@
     history.replaceState(null, '', '#d' + (day + 1));
   }
 
+  function dayFromHash() {
+    const match = /^#d([1-9]\d*)$/.exec(location.hash);
+    const index = match ? Number(match[1]) - 1 : -1;
+    return index < TRIP.length ? index : -1;
+  }
+
   function initialDay() {
-    const m = /^#d([1-8])$/.exec(location.hash);
-    if (m) return Number(m[1]) - 1;
+    const linked = dayFromHash();
+    if (linked >= 0) return linked;
     const today = TRIP.findIndex(t => t.date === todayStr());
     if (today >= 0) return today;
     const saved = store.get('trip-day');
@@ -315,7 +323,7 @@
   }
 
   function setOfflineLabel() {
-    const o = store.get('trip-offline');
+    const o = store.get(OFFLINE_KEY);
     $('#offline').textContent = o ? '离线已就绪 ✓' : '离线准备';
     $('#offline').title = o ? `已缓存 ${o.n} 张地图瓦片，${new Date(o.t).toLocaleDateString('zh-CN')}` : '';
   }
@@ -347,7 +355,7 @@
       toast(`有 ${failed} 张地图没缓存成功，请换个网络再点一次`, 5000);
       btn.textContent = '离线准备';
     } else {
-      store.set('trip-offline', { t: Date.now(), n: urls.length - failed });
+      store.set(OFFLINE_KEY, { t: Date.now(), n: urls.length - failed });
       toast(`离线已就绪：行程、天气和 ${urls.length - failed} 张地图已存到本机`, 4000);
       setOfflineLabel();
     }
@@ -386,7 +394,7 @@
 
   renderTabs();
   initMap();
-  $('#fit').addEventListener('click', fit);
+  $('#fit').addEventListener('click', () => fit());
   $('#hotelFocus').addEventListener('click', focusHotel);
   $('#search').addEventListener('input', renderList);
   $('#next').addEventListener('click', () => { setDay(day + 1); if (isMobileLayout()) window.scrollTo(0, 0); });
@@ -400,7 +408,10 @@
     const p = TRIP[day].coords[Number(el.id.replace('stop', ''))];
     if (p) map.panTo(p);
   }, true);
-  window.addEventListener('hashchange', () => { const m = /^#d([1-8])$/.exec(location.hash); if (m && Number(m[1]) - 1 !== day) setDay(Number(m[1]) - 1); });
+  window.addEventListener('hashchange', () => {
+    const linked = dayFromHash();
+    if (linked >= 0 && linked !== day) setDay(linked);
+  });
   window.addEventListener('online', () => { updateNetBadge(); loadWeather(); });
   window.addEventListener('offline', () => { updateNetBadge(); renderWeather(); });
 

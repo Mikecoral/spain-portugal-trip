@@ -33,6 +33,16 @@ const HOTELS = {
     tooltip: '<b>我们的酒店</b><br>VIP Executive Suites do Marquês',
     latlng: [38.727956, -9.144933],
     url: gmaps('VIP Executive Suites do Marquês Hotel, Av. Duque de Loulé 45, Lisboa, Portugal')
+  },
+  schiphol: {
+    name: 'ibis Schiphol Amsterdam Airport',
+    stopName: 'ibis Schiphol Amsterdam Airport',
+    stayLabel: '阿姆斯特丹机场住宿 · ibis Schiphol Amsterdam Airport',
+    address: 'Schipholweg 181, 1171 PK Badhoevedorp',
+    popupAddress: 'Schipholweg 181, 1171 PK Badhoevedorp',
+    tooltip: '<b>机场住宿</b><br>ibis Schiphol Amsterdam Airport',
+    latlng: [52.32536, 4.79399],
+    url: gmaps('ibis Schiphol Amsterdam Airport, Schipholweg 181, Badhoevedorp')
   }
 };
 
@@ -41,7 +51,8 @@ const CITIES = {
   madrid:    { name: '马德里',   latlng: [40.4168, -3.7038] },
   toledo:    { name: '托莱多',   latlng: [39.8628, -4.0273] },
   barcelona: { name: '巴塞罗那', latlng: [41.3874, 2.1686] },
-  lisbon:    { name: '里斯本',   latlng: [38.7223, -9.1393] }
+  lisbon:    { name: '里斯本',   latlng: [38.7223, -9.1393] },
+  amsterdam: { name: '阿姆斯特丹', latlng: [52.3728, 4.8936] }
 };
 
 // 主题色：accent 用于标签、编号、地图标记；pin 是地图标记的底色。
@@ -57,6 +68,7 @@ const THEMES = {
 //   coords    与 stops 一一对应；null = 没有地图位置（如"午餐"）。坐标与酒店重合的停留点不画标记。
 //   offRoute  不参与虚线连线的停留点序号（机动备选）。
 //   optional  用虚线圆圈标记的备选点序号。
+//   routeStops 按给定序号画步行线，默认缩放到该段；「当天范围」仍显示全部标记。
 //   mapSuffix / mapQuery  生成 Google Maps 链接：默认 "名称 + 后缀"，mapQuery 可按名称覆盖。
 const TRIP = [
   {
@@ -120,6 +132,35 @@ const TRIP = [
       'Praça do Comércio / Arco da Rua Augusta': 'Arco da Rua Augusta, Lisboa, Portugal'
     },
     coords: [[38.727956, -9.144933], [38.7804, -9.4989], [38.8405, -9.4622], [38.8025, -9.3756], [38.7138, -9.1394], [38.7139, -9.1335], [38.7117, -9.1301], [38.7098, -9.1333], [38.7087, -9.1367], [38.7108, -9.1377], [38.7121, -9.1394], [38.7129, -9.1388]]
+  },
+  {
+    date: '2026-12-03', city: 'amsterdam', theme: 'blue', short: '里斯本与灯光节', tabCount: 10,
+    hotel: 'schiphol', hotelOnMap: true, mapSuffix: ', Amsterdam, Netherlands',
+    mapQuery: {
+      'Aeroporto Humberto Delgado · LIS': 'Lisbon Airport Terminal 1, Lisbon, Portugal',
+      'Schiphol Airport · AMS': 'Schiphol Plaza, Schiphol Airport, Netherlands',
+      'Amsterdam Centraal → Schiphol Airport': 'Amsterdam Centraal, Amsterdam, Netherlands'
+    },
+    routeStops: [4, 5, 6, 7, 8, 4],
+    coords: [null, null, [52.3097, 4.7634], HOTELS.schiphol.latlng, [52.3781, 4.9005],
+      [52.37625, 4.9082], [52.3742, 4.9123], [52.3697, 4.9111], [52.37204, 4.90566], null]
+  },
+  {
+    date: '2026-12-04', city: 'amsterdam', theme: 'blue', short: '运河、九街与花市', tabCount: 12,
+    hotel: 'schiphol', hotelOnMap: true, mapSuffix: ', Amsterdam, Netherlands',
+    stayLabel: '上午从 ibis Schiphol Amsterdam Airport 退房出发',
+    mapQuery: {
+      'Schiphol Airport · AMS': 'Schiphol Plaza, Schiphol Airport, Netherlands',
+      'Damrak Waterfront': 'Damrak Waterfront, Amsterdam, Netherlands',
+      'Oudezijds Voorburgwal · De Wallen': 'Oudezijds Voorburgwal at Damstraat, Amsterdam, Netherlands',
+      'Reestraat · De 9 Straatjes': 'Reestraat, Amsterdam, Netherlands',
+      'Rokin → Amsterdam Centraal': 'Rokin metro station, Amsterdam, Netherlands',
+      'Amsterdam Centraal → Schiphol Airport': 'Amsterdam Centraal, Amsterdam, Netherlands'
+    },
+    routeStops: [2, 3, 4, 5, 6, 7, 8, 9],
+    coords: [HOTELS.schiphol.latlng, [52.3097, 4.7634], [52.3781, 4.9005],
+      [52.3762, 4.8988], [52.3745, 4.898], [52.3719, 4.8958], [52.3725, 4.8828],
+      [52.369, 4.8877], [52.3667, 4.8919], [52.3691, 4.8926], null, null]
   }
 ];
 

@@ -1,7 +1,7 @@
 // Service Worker：让行程页在国外没网/弱网时也能打开。
 //  - 页面本体与 Leaflet：先用缓存，后台静默更新（下次打开即为新版）。
 //  - 地图瓦片：缓存优先，访问过或"离线准备"过的区域断网也能看。
-const SHELL = 'trip-shell-v1';
+const SHELL = 'trip-shell-v2';
 const TILES = 'trip-tiles-v1';
 const MAX_TILES = 2500;
 const ASSETS = [
